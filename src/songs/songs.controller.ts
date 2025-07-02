@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Delete, Post, Patch, Body } from '@nestjs/common';
+import { Controller, Get, Put, Delete, Post, Patch, Body, HttpException, HttpStatus, Param, ParseIntPipe } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreatSongDTO } from './dto/create-song-dto';
 
@@ -13,23 +13,12 @@ export class SongsController {
 
     @Get()
     findAll() {
+        try {
         return this.SongsService.findAll();
-    }
-    @Get(':id')
-    findOne() {
-        return 'fetch song by id';
-    }
-    @Put(':id')
-    update() {
-        return 'update song by id';
-    }
-    @Delete(':id')
-    remove() {
-        return 'delete song by id';
-    }
-    @Patch(':id')
-    patch() {
-        return 'patch song by id';
+        } catch (e) {
+            console.log('error fetching songs', e);
+            throw new HttpException('server error', HttpStatus.INTERNAL_SERVER_ERROR, {cause: e},); 
+        }
     }
     @Get('search')
     search() {
@@ -46,6 +35,24 @@ export class SongsController {
     @Get('top')
     top() {
         return 'fetch top songs';
+    }
+    @Get(':id')
+    findOne(@Param('id', new ParseIntPipe({
+        errorHttpStatusCode: HttpStatus.NOT_FOUND
+    })) id: number) {
+        return `fetch song by ${id}`;
+    }
+    @Put(':id')
+    update() {
+        return 'update song by id';
+    }
+    @Delete(':id')
+    remove() {
+        return 'delete song by id';
+    }
+    @Patch(':id')
+    patch() {
+        return 'patch song by id';
     }
     @Get('genre/:genre')
     findByGenre() {
