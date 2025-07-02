@@ -1,15 +1,121 @@
+# Songs API Testing
+
+### 1. Create Song - Valid Request
 POST http://localhost:3000/songs HTTP/1.1
 Content-Type: application/json
 
 {
-  "title": "Yeezy",
-  "artist": ["Kanye"],
-  "album": "New Album",
-  "year": "2023",
-  "releaseDate": "2023-10-01",
-  "duration": "03:34"
+  "title": "Bohemian Rhapsody",
+  "artist": ["Queen", "Freddie Mercury"],
+  "album": "A Night at the Opera",
+  "genre": "Rock",
+  "releaseDate": "1975-10-31",
+  "duration": "05:55"
 }
-###
-GET http://localhost:3000/songs
-###
-GET http://localhost:3000/songs/1
+
+### 2. Create Song - Another Valid Song
+POST http://localhost:3000/songs HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Imagine",
+  "artist": ["John Lennon"],
+  "album": "Imagine",
+  "genre": "Pop",
+  "releaseDate": "1971-09-09",
+  "duration": "03:07"
+}
+
+### 3. Create Song - Validation Error (Missing Required Fields)
+POST http://localhost:3000/songs HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "",
+  "artist": [],
+  "album": "Test Album"
+}
+
+### 4. Create Song - Invalid Duration Format
+POST http://localhost:3000/songs HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Test Song",
+  "artist": ["Test Artist"],
+  "album": "Test Album",
+  "releaseDate": "2023-01-01",
+  "duration": "invalid"
+}
+
+### 5. Get All Songs
+GET http://localhost:3000/songs HTTP/1.1
+
+### 6. Get Song by ID - Valid
+GET http://localhost:3000/songs/2 HTTP/1.1
+
+### 7. Get Song by ID - Not Found
+GET http://localhost:3000/songs/999 HTTP/1.1
+
+### 8. Update Song - Full Update (PUT)
+PUT http://localhost:3000/songs/1 HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Bohemian Rhapsody (Remastered)",
+  "artist": ["Queen"],
+  "album": "A Night at the Opera (Remastered)",
+  "genre": "Progressive Rock",
+  "releaseDate": "1975-10-31",
+  "duration": "05:55"
+}
+
+### 9. Update Song - Partial Update (PATCH)
+PATCH http://localhost:3000/songs/1 HTTP/1.1
+Content-Type: application/json
+
+{
+  "genre": "Classic Rock"
+}
+
+### 10. Search Songs
+GET http://localhost:3000/songs/search?q=Bohemian HTTP/1.1
+
+### 11. Search Songs - Missing Query Parameter
+GET http://localhost:3000/songs/search HTTP/1.1
+
+### 12. Get Songs by Genre
+GET http://localhost:3000/songs/genre/Rock HTTP/1.1
+
+### 13. Get Songs by Artist
+GET http://localhost:3000/songs/artist/Queen HTTP/1.1
+
+### 14. Get Songs by Album
+GET http://localhost:3000/songs/album/Imagine HTTP/1.1
+
+### 15. Special Endpoints - Popular Songs
+GET http://localhost:3000/songs/popular HTTP/1.1
+
+### 16. Special Endpoints - Recent Songs
+GET http://localhost:3000/songs/recent HTTP/1.1
+
+### 17. Special Endpoints - Top Songs
+GET http://localhost:3000/songs/top HTTP/1.1
+
+### 18. Delete Song
+DELETE http://localhost:3000/songs/1 HTTP/1.1
+
+### 19. Try to Get Deleted Song (Should Return 404)
+GET http://localhost:3000/songs/1 HTTP/1.1
+
+### 20. Create Song Without Optional Genre
+POST http://localhost:3000/songs HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Yesterday",
+  "artist": ["The Beatles", "Paul McCartney"],
+  "album": "Help!",
+  "releaseDate": "1965-08-06",
+  "duration": "02:05"
+}
