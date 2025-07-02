@@ -1,67 +1,70 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Song } from './interfaces/song.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, ILike } from 'typeorm';
+import { Song } from './entities/song.entity';
 import { CreateSongDTO } from './dto/create-song-dto';
 
 @Injectable()
 export class SongsService {
-  private readonly songs: Song[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(Song)
+    private songsRepository: Repository<Song>,
+  ) {}
 
-  create(createSongDTO: CreateSongDTO): Song {
-    const song: Song = {
-      id: this.idCounter++,
-      ...createSongDTO,
-    };
-    this.songs.push(song);
-    return song;
+  async create(createSongDTO: CreateSongDTO): Promise<Song> {
+    const song = this.songsRepository.create(createSongDTO);
+    return await this.songsRepository.save(song);
   }
 
-  findAll(): Song[] {
-    return this.songs;
+  async findAll(): Promise<Song[]> {
+    return await this.songsRepository.find({
+      order: { createdAt: 'DESC' },
+    });
   }
 
-  findOne(id: number): Song {
-    const song = this.songs.find((song) => song.id === id);
+  async findOne(id: number): Promise<Song> {
+    const song = await this.songsRepository.findOne({ where: { id } });
     if (!song) {
       throw new NotFoundException(`Song with ID ${id} not found`);
     }
     return song;
   }
 
-  update(id: number, updateSongDTO: Partial<CreateSongDTO>): Song {
-    const songIndex = this.songs.findIndex((song) => song.id === id);
-    if (songIndex === -1) {
+  async update(id: number, updateSongDTO: Partial<CreateSongDTO>): Promise<Song> {
+    const song = await this.findOne(id); // This will throw if not found
+    Object.assign(song, updateSongDTO);
+    return await this.songsRepository.save(song);
+  }
+
+  async remove(id: number): Promise<void> {
+    const result = await this.songsRepository.delete(id);
+    if (result.affected === 0) {
       throw new NotFoundException(`Song with ID ${id} not found`);
     }
-
-    const updatedSong = { ...this.songs[songIndex], ...updateSongDTO };
-    this.songs[songIndex] = updatedSong;
-    return updatedSong;
   }
 
-  remove(id: number): void {
-    const songIndex = this.songs.findIndex((song) => song.id === id);
-    if (songIndex === -1) {
-      throw new NotFoundException(`Song with ID ${id} not found`);
-    }
-    this.songs.splice(songIndex, 1);
+  async findByGenre(genre: string): Promise<Song[]> {
+    return await this.songsRepository.find({
+      where: { genre: ILike(`%${genre}%`) },
+      order: { createdAt: 'DESC' },
+    });
   }
 
-  findByGenre(genre: string): Song[] {
-    return this.songs.filter(
-      (song) => song.genre?.toLowerCase() === genre.toLowerCase(),
-    );
+  async findByArtist(artist: string): Promise<Song[]> {
+    return await this.songsRepository
+      .createQueryBuilder('song')
+      .where(':artist = ANY(song.artist)', { artist })
+      .orWhere('array_to_string(song.artist, \',\') ILIKE :artistPattern', {
+        artistPattern: `%${artist}%`,
+      })
+      .orderBy('song.createdAt', 'DESC')
+      .getMany();
   }
 
-  findByArtist(artist: string): Song[] {
-    return this.songs.filter((song) =>
-      song.artist.some((a) => a.toLowerCase().includes(artist.toLowerCase())),
-    );
-  }
-
-  findByAlbum(album: string): Song[] {
-    return this.songs.filter((song) =>
-      song.album.toLowerCase().includes(album.toLowerCase()),
-    );
+  async findByAlbum(album: string): Promise<Song[]> {
+    return await this.songsRepository.find({
+      where: { album: ILike(`%${album}%`) },
+      order: { createdAt: 'DESC' },
+    });
   }
 }

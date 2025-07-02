@@ -1,13 +1,24 @@
-/* eslint-disable prettier/prettier */
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SongsModule } from './songs/songs.module';
 import { LoggerMiddleware } from './common/middleware/logger.module';
 import { SongsController } from './songs/songs.controller';
+import databaseConfig from './config/database.config';
 
 @Module({
-  imports: [SongsModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [databaseConfig],
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: databaseConfig,
+    }),
+    SongsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
