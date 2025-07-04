@@ -11,11 +11,14 @@ import {
   Param,
   ParseIntPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDTO } from './dto/create-song-dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('songs')
+@UseGuards(JwtAuthGuard)
 export class SongsController {
   constructor(private songsService: SongsService) {}
 

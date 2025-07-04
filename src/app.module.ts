@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SongsModule } from './songs/songs.module';
+import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './common/middleware/logger.module';
 import { SongsController } from './songs/songs.controller';
 import databaseConfig from './config/database.config';
@@ -18,6 +19,7 @@ import databaseConfig from './config/database.config';
       useFactory: databaseConfig,
     }),
     SongsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

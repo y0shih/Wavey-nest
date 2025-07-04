@@ -1,9 +1,99 @@
-# Songs API Documentation
+# API Documentation
 
 ## Base URL
 `http://localhost:3000`
 
-## Endpoints
+## Authentication
+This API uses JWT (JSON Web Token) authentication. After logging in, include the token in the Authorization header:
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+## Authentication Endpoints
+
+### 1. Register User
+**POST** `/auth/register`
+
+Creates a new user account.
+
+**Required Headers:**
+- `Content-Type: application/json`
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "name": "John Doe" (optional)
+}
+```
+
+**Validation Rules:**
+- `email`: Valid email format (required)
+- `password`: Minimum 6 characters (required)
+- `name`: Optional string
+
+**Response:** `201 Created`
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "John Doe"
+  }
+}
+```
+
+### 2. Login User
+**POST** `/auth/login`
+
+Authenticates a user and returns a JWT token.
+
+**Required Headers:**
+- `Content-Type: application/json`
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "John Doe"
+  }
+}
+```
+
+### 3. Get User Profile
+**GET** `/auth/profile`
+
+Returns the current user's profile information.
+
+**Required Headers:**
+- `Authorization: Bearer <jwt_token>`
+
+**Response:** `200 OK`
+```json
+{
+  "id": 1,
+  "email": "user@example.com",
+  "name": "John Doe",
+  "createdAt": "2023-10-01T10:00:00.000Z",
+  "updatedAt": "2023-10-01T10:00:00.000Z"
+}
+```
+
+## Songs Endpoints
+⚠️ **Note:** All songs endpoints require authentication. Include the JWT token in the Authorization header.
 
 ### 1. Create Song
 **POST** `/songs`
@@ -12,6 +102,7 @@ Creates a new song with validation.
 
 **Required Headers:**
 - `Content-Type: application/json`
+- `Authorization: Bearer <jwt_token>`
 
 **Request Body:**
 ```json
@@ -51,6 +142,9 @@ Creates a new song with validation.
 
 Retrieves all songs.
 
+**Required Headers:**
+- `Authorization: Bearer <jwt_token>`
+
 **Response:** `200 OK`
 ```json
 [
@@ -69,6 +163,9 @@ Retrieves all songs.
 ### 3. Get Song by ID
 **GET** `/songs/:id`
 
+**Required Headers:**
+- `Authorization: Bearer <jwt_token>`
+
 **Parameters:**
 - `id`: Song ID (integer)
 
@@ -76,6 +173,9 @@ Retrieves all songs.
 
 ### 4. Update Song (Full Update)
 **PUT** `/songs/:id`
+
+**Required Headers:**
+- `Authorization: Bearer <jwt_token>`
 
 **Parameters:**
 - `id`: Song ID (integer)
@@ -85,6 +185,9 @@ Retrieves all songs.
 ### 5. Update Song (Partial Update)
 **PATCH** `/songs/:id`
 
+**Required Headers:**
+- `Authorization: Bearer <jwt_token>`
+
 **Parameters:**
 - `id`: Song ID (integer)
 
@@ -92,6 +195,9 @@ Retrieves all songs.
 
 ### 6. Delete Song
 **DELETE** `/songs/:id`
+
+**Required Headers:**
+- `Authorization: Bearer <jwt_token>`
 
 **Parameters:**
 - `id`: Song ID (integer)
@@ -106,11 +212,17 @@ Retrieves all songs.
 ### 7. Search Songs
 **GET** `/songs/search?q={query}`
 
+**Required Headers:**
+- `Authorization: Bearer <jwt_token>`
+
 **Query Parameters:**
 - `q`: Search query (required)
 
 ### 8. Get Songs by Genre
 **GET** `/songs/genre/:genre`
+
+**Required Headers:**
+- `Authorization: Bearer <jwt_token>`
 
 **Parameters:**
 - `genre`: Genre name (string)
@@ -118,16 +230,23 @@ Retrieves all songs.
 ### 9. Get Songs by Artist
 **GET** `/songs/artist/:artist`
 
+**Required Headers:**
+- `Authorization: Bearer <jwt_token>`
+
 **Parameters:**
 - `artist`: Artist name (string, partial match)
 
 ### 10. Get Songs by Album
 **GET** `/songs/album/:album`
 
+**Required Headers:**
+- `Authorization: Bearer <jwt_token>`
+
 **Parameters:**
 - `album`: Album name (string, partial match)
 
 ### 11. Special Endpoints (Placeholders)
+**Required Headers for all:** `Authorization: Bearer <jwt_token>`
 - **GET** `/songs/popular` - Popular songs
 - **GET** `/songs/recent` - Recent songs  
 - **GET** `/songs/top` - Top songs
@@ -140,6 +259,30 @@ Retrieves all songs.
   "message": ["title should not be empty", "duration must be a valid representation of military time"],
   "error": "Bad Request",
   "statusCode": 400
+}
+```
+
+**401 Unauthorized** - Authentication errors
+```json
+{
+  "message": "Unauthorized",
+  "statusCode": 401
+}
+```
+
+**401 Unauthorized** - Invalid credentials (login)
+```json
+{
+  "message": "Invalid credentials",
+  "statusCode": 401
+}
+```
+
+**401 Unauthorized** - Email already exists (register)
+```json
+{
+  "message": "Email already exists",
+  "statusCode": 401
 }
 ```
 
