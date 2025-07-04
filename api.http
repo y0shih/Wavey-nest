@@ -1,8 +1,39 @@
-# Songs API Testing
+# API Testing with JWT Authentication
 
-### 1. Create Song - Valid Request
+# Note: After login/register, copy the access_token from the response 
+# and replace YOUR_JWT_TOKEN_HERE with the actual token
+
+### Authentication Endpoints ###
+
+### 1. Register New User
+POST http://localhost:3000/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123",
+  "name": "Test User"
+}
+
+### 2. Login User
+POST http://localhost:3000/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### 3. Get User Profile (Protected)
+GET http://localhost:3000/auth/profile HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Songs Endpoints (All Protected) ###
+
+### 4. Create Song - Valid Request
 POST http://localhost:3000/songs HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 {
   "title": "Bohemian Rhapsody",
@@ -13,9 +44,10 @@ Content-Type: application/json
   "duration": "05:55"
 }
 
-### 2. Create Song - Another Valid Song
+### 5. Create Song - Another Valid Song
 POST http://localhost:3000/songs HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 {
   "title": "Imagine",
@@ -26,9 +58,10 @@ Content-Type: application/json
   "duration": "03:07"
 }
 
-### 3. Create Song - Validation Error (Missing Required Fields)
+### 6. Create Song - Validation Error (Missing Required Fields)
 POST http://localhost:3000/songs HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 {
   "title": "",
@@ -36,9 +69,10 @@ Content-Type: application/json
   "album": "Test Album"
 }
 
-### 4. Create Song - Invalid Duration Format
+### 7. Create Song - Invalid Duration Format
 POST http://localhost:3000/songs HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 {
   "title": "Test Song",
@@ -48,18 +82,34 @@ Content-Type: application/json
   "duration": "invalid"
 }
 
-### 5. Get All Songs
+### 8. Create Song - Without Authorization (Should Fail)
+POST http://localhost:3000/songs HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Unauthorized Song",
+  "artist": ["Test Artist"],
+  "album": "Test Album",
+  "releaseDate": "2023-01-01",
+  "duration": "03:00"
+}
+
+### 9. Get All Songs
 GET http://localhost:3000/songs HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 6. Get Song by ID - Valid
+### 10. Get Song by ID - Valid
 GET http://localhost:3000/songs/2 HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 7. Get Song by ID - Not Found
+### 11. Get Song by ID - Not Found
 GET http://localhost:3000/songs/999 HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 8. Update Song - Full Update (PUT)
+### 12. Update Song - Full Update (PUT)
 PUT http://localhost:3000/songs/1 HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 {
   "title": "Bohemian Rhapsody (Remastered)",
@@ -70,47 +120,59 @@ Content-Type: application/json
   "duration": "05:55"
 }
 
-### 9. Update Song - Partial Update (PATCH)
+### 13. Update Song - Partial Update (PATCH)
 PATCH http://localhost:3000/songs/1 HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 {
   "genre": "Classic Rock"
 }
 
-### 10. Search Songs
+### 14. Search Songs
 GET http://localhost:3000/songs/search?q=Bohemian HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 11. Search Songs - Missing Query Parameter
+### 15. Search Songs - Missing Query Parameter
 GET http://localhost:3000/songs/search HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 12. Get Songs by Genre
+### 16. Get Songs by Genre
 GET http://localhost:3000/songs/genre/Rock HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 13. Get Songs by Artist
+### 17. Get Songs by Artist
 GET http://localhost:3000/songs/artist/Queen HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 14. Get Songs by Album
+### 18. Get Songs by Album
 GET http://localhost:3000/songs/album/Imagine HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 15. Special Endpoints - Popular Songs
+### 19. Special Endpoints - Popular Songs
 GET http://localhost:3000/songs/popular HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 16. Special Endpoints - Recent Songs
+### 20. Special Endpoints - Recent Songs
 GET http://localhost:3000/songs/recent HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 17. Special Endpoints - Top Songs
+### 21. Special Endpoints - Top Songs
 GET http://localhost:3000/songs/top HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 18. Delete Song
+### 22. Delete Song
 DELETE http://localhost:3000/songs/1 HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 19. Try to Get Deleted Song (Should Return 404)
+### 23. Try to Get Deleted Song (Should Return 404)
 GET http://localhost:3000/songs/1 HTTP/1.1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 20. Create Song Without Optional Genre
+### 24. Create Song Without Optional Genre
 POST http://localhost:3000/songs HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
 {
   "title": "Yesterday",
@@ -119,3 +181,28 @@ Content-Type: application/json
   "releaseDate": "1965-08-06",
   "duration": "02:05"
 }
+
+### Testing Authentication Errors ###
+
+### 25. Login with Wrong Password
+POST http://localhost:3000/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "wrongpassword"
+}
+
+### 26. Register with Existing Email
+POST http://localhost:3000/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123",
+  "name": "Another User"
+}
+
+### 27. Access Protected Route with Invalid Token
+GET http://localhost:3000/songs HTTP/1.1
+Authorization: Bearer invalid_token_here
