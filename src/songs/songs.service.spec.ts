@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { Song } from './entities/song.entity';
@@ -8,7 +7,6 @@ import { CreateSongDTO } from './dto/create-song-dto';
 
 describe('SongsService', () => {
   let service: SongsService;
-  let repository: Repository<Song>;
 
   const mockRepository = {
     create: jest.fn(),
@@ -31,7 +29,6 @@ describe('SongsService', () => {
     }).compile();
 
     service = module.get<SongsService>(SongsService);
-    repository = module.get<Repository<Song>>(getRepositoryToken(Song));
   });
 
   it('should be defined', () => {

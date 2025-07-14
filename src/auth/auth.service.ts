@@ -26,7 +26,11 @@ export class AuthService {
     }
 
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const hashedPassword = (await (bcrypt as any).hash(
+      password,
+      saltRounds,
+    )) as string;
 
     const user = this.userRepository.create({
       email,
@@ -57,7 +61,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const isPasswordValid = (await (bcrypt as any).compare(
+      password,
+      user.password,
+    )) as boolean;
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }

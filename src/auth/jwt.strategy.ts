@@ -10,8 +10,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly configService: ConfigService,
     private readonly authService: AuthService,
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+      jwtFromRequest: (ExtractJwt as any).fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey:
         configService.get<string>('JWT_SECRET') || '444444444444444444',

@@ -4,10 +4,41 @@
 `http://localhost:3000`
 
 ## Authentication
-This API uses JWT (JSON Web Token) authentication. After logging in, include the token in the Authorization header:
+This API supports two authentication methods:
+
+### 1. JWT Authentication
+For direct API access, use JWT (JSON Web Token) authentication. After logging in, include the token in the Authorization header:
 ```
 Authorization: Bearer <your_jwt_token>
 ```
+
+### 2. Neon OAuth Authentication
+For third-party authentication through Neon Auth:
+
+**Required Headers:**
+```
+'x-stack-access-type': 'server'
+'x-stack-project-id': '<your_neon_auth_project_id>'
+'x-stack-secret-server-key': '<your_neon_auth_server_key>'
+'x-stack-access-token': '<access_token_from_headers>'
+```
+
+**Endpoint:** `https://api.stack-auth.com/api/v1/users/me`
+
+**Response:** `200 OK`
+```json
+{
+  "user": {
+    // User profile information from Neon Auth
+  }
+}
+```
+
+**Authentication Flow:**
+1. User authenticates through Neon Auth in the frontend
+2. Frontend receives access token from Neon Auth
+3. Backend validates the token using the Neon Auth API
+4. On successful validation, backend creates/updates local user profile and issues JWT token
 
 ## Authentication Endpoints
 
