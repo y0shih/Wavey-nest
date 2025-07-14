@@ -17,8 +17,10 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     const { email, password, name } = registerDto;
-    
-    const existingUser = await this.userRepository.findOne({ where: { email } });
+
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+    });
     if (existingUser) {
       throw new UnauthorizedException('Email already exists');
     }
@@ -49,7 +51,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
-    
+
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');

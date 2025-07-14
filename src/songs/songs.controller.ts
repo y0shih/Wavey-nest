@@ -116,8 +116,8 @@ export class SongsController {
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    this.songsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.songsService.remove(id);
     return { message: `Song with ID ${id} has been deleted` };
   }
 }

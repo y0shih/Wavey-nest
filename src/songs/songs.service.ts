@@ -30,7 +30,10 @@ export class SongsService {
     return song;
   }
 
-  async update(id: number, updateSongDTO: Partial<CreateSongDTO>): Promise<Song> {
+  async update(
+    id: number,
+    updateSongDTO: Partial<CreateSongDTO>,
+  ): Promise<Song> {
     const song = await this.findOne(id); // This will throw if not found
     Object.assign(song, updateSongDTO);
     return await this.songsRepository.save(song);
@@ -54,7 +57,7 @@ export class SongsService {
     return await this.songsRepository
       .createQueryBuilder('song')
       .where(':artist = ANY(song.artist)', { artist })
-      .orWhere('array_to_string(song.artist, \',\') ILIKE :artistPattern', {
+      .orWhere("array_to_string(song.artist, ',') ILIKE :artistPattern", {
         artistPattern: `%${artist}%`,
       })
       .orderBy('song.createdAt', 'DESC')
